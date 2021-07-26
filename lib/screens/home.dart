@@ -57,19 +57,9 @@ class _HomePageState extends State<HomePage> {
     return TextField(
       autofocus: false,
       decoration: InputDecoration(
-          filled: true,
-          fillColor: Colors.white70,
           hintText: "Search",
-          border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15.0)),
-              borderSide: const BorderSide(color: Colors.grey)),
+          border: UnderlineInputBorder(),
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(10.0),
-            ),
-            borderSide: BorderSide(color: Colors.blue),
-          ),
           hintStyle: TextStyle(color: Colors.black12),
           prefixIcon: new Icon(Icons.search, color: Colors.grey)),
       style: TextStyle(color: Colors.black, fontSize: 16.0),

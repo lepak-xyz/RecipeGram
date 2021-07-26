@@ -93,8 +93,8 @@ class FeedCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      "Ali Abu",
-                      style: TextStyle(color: Colors.white),
+                      "@${recipe.author['username']}",
+                      style: TextStyle(color: Colors.white, fontSize: 14.0, fontWeight: FontWeight.bold),
                     ),
                     flex: 80,
                   ),

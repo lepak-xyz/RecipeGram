@@ -22,9 +22,10 @@ environment:
 
 dependencies:
   http: ^0.13.3
-  flutter_bloc: ^7.0.0
   share: ^2.0.4
   fluttertoast: ^8.0.7
+  image_picker: ^0.8.2
+  shared_preferences: any
   flutter:
     sdk: flutter
 

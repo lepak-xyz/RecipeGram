@@ -60,7 +60,7 @@ class RecipeDetail extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: ExactAssetImage('assets/spaghetti.png'),
+                        image: NetworkImage(sRecipe.image),
                         fit: BoxFit.cover),
                   ),
                   child: BackdropFilter(
@@ -127,10 +127,11 @@ class RecipeDetail extends StatelessWidget {
                           ),
                           ListView.builder(
                             shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
                             itemCount: sRecipe.ingredients.length,
                             itemBuilder: (BuildContext ctxt, int index) {
                               return new Text(
-                                  "${index + 1}.${sRecipe.ingredients.values.elementAt(index)}");
+                                  "- ${sRecipe.ingredients.values.elementAt(index)}");
                             },
                           ),
                           SizedBox(
@@ -144,6 +145,7 @@ class RecipeDetail extends StatelessWidget {
                           ),
                           ListView.builder(
                             shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
                             itemCount: sRecipe.instructions.length,
                             itemBuilder: (BuildContext ctxt, int index) {
                               return new Text(

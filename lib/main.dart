@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:recipe_gram/screens/account/profile.dart';
-import 'package:recipe_gram/screens/account/settings.dart';
 import 'package:recipe_gram/screens/home.dart';
 import 'package:recipe_gram/screens/login.dart';
 import 'package:recipe_gram/screens/register.dart';
-import 'package:recipe_gram/screens/search.dart';
 import 'package:recipe_gram/utilities/repgram-theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,7 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => MyHomePage(),
+        '/': (context) => SplashScreen(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/home': (context) => HomePage(),
@@ -40,7 +38,39 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  late SharedPreferences _sharedPreferences;
+  bool showButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
+
+  checkLoginStatus() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+
+    if (_sharedPreferences.getBool("first_time") != null) {
+      setState(() {
+        showButton = true;
+      });
+    } else {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (_sharedPreferences.getString("token") != null) {
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        } else {
+          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,16 +90,20 @@ class MyHomePage extends StatelessWidget {
             SizedBox(
               height: 40,
             ),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                  //Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-                },
-                child: Text("LET'S GET STARTED"),
-                style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    onPrimary: Colors.red[800],
-                padding: EdgeInsets.symmetric(horizontal: 60, vertical: 15)))
+            showButton
+                ? ElevatedButton(
+                    onPressed: () {
+                      //Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/login', (route) => false);
+                    },
+                    child: Text("LET'S GET STARTED"),
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.white,
+                        onPrimary: Colors.red[800],
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 60, vertical: 15)))
+                : SizedBox()
           ],
         ),
       ),
