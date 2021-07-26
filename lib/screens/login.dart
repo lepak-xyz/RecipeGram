@@ -53,8 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                           topRight: const Radius.circular(50.0)
                       )
                   ),
-                  child: Form(
-                    child: Column(
+                  child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
@@ -67,12 +66,13 @@ class _LoginPageState extends State<LoginPage> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 24)),
                             ElevatedButton(
-                              onPressed: () {}, child: Text("SIGN IN "), style: ElevatedButton.styleFrom(minimumSize: Size(0.8 * width, 40)))
+                              onPressed: () {
+                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              }, child: Text("SIGN IN "), style: ElevatedButton.styleFrom(minimumSize: Size(0.8 * width, 40)))
                           ],
                         ) // 0146284528
                       ],
                     ),
-                  )
               ),
             )
           ],
