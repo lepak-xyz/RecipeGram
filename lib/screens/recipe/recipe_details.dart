@@ -1,14 +1,55 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_gram/models/recipe_model.dart';
+import 'package:recipe_gram/models/user_model.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class RecipeDetail extends StatelessWidget {
+class RecipeDetail extends StatefulWidget {
   final Recipe sRecipe;
-
   const RecipeDetail({required this.sRecipe});
+
+  @override
+  _RecipeDetailState createState() => _RecipeDetailState();
+}
+
+class _RecipeDetailState extends State<RecipeDetail> {
+  late User _user;
+  bool isFavourite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  loadUserData() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _user = User.fromJson(json.decode(_prefs.getString("user") ?? ""));
+
+    setState(() {
+      isFavourite = _user.favourites.contains(widget.sRecipe.id);
+    });
+  }
+
+  addToFavourites() async {
+    // TODO
+    // ADD TO DATABASE
+    setState(() {
+      isFavourite = true;
+    });
+    return false;
+  }
+
+  removeFavourites() async {
+    // TODO
+    // REMOVE FROM DATABASE
+    isFavourite = false;
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +70,11 @@ class RecipeDetail extends StatelessWidget {
                         children: <Widget>[
                           ListTile(
                             leading: Icon(Icons.favorite),
-                            title: Text("Add To Favourite"),
+                            title: isFavourite ? Text("Remove from Favourite") : Text("Add To Favourite"),
                             onTap: () {
+                              setState(() {
+                                isFavourite = !isFavourite;
+                              });
                               Navigator.pop(context);
                             },
                           ),
@@ -39,7 +83,7 @@ class RecipeDetail extends StatelessWidget {
                             title: Text("Share"),
                             onTap: () {
                               Share.share(
-                                  "Check out `${sRecipe.name}}` recipe by ...");
+                                  "Check out `${widget.sRecipe.name}}` recipe by @${widget.sRecipe.author['username']}");
                               Navigator.pop(context);
                             },
                           ),
@@ -60,7 +104,7 @@ class RecipeDetail extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: NetworkImage(sRecipe.image),
+                        image: NetworkImage(widget.sRecipe.image),
                         fit: BoxFit.cover),
                   ),
                   child: BackdropFilter(
@@ -74,7 +118,7 @@ class RecipeDetail extends StatelessWidget {
                   ),
                 ),
                 Center(
-                  child: Text(sRecipe.name),
+                  child: Text(widget.sRecipe.name),
                 ),
                 Align(
                   alignment: Alignment(0.9, -7.0),
@@ -99,7 +143,7 @@ class RecipeDetail extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(5),
                       child: Text(
-                        sRecipe.name,
+                        widget.sRecipe.name,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 24.0,
@@ -120,7 +164,7 @@ class RecipeDetail extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            "Ingredients (${sRecipe.ingredients.length})",
+                            "Ingredients (${widget.sRecipe.ingredients.length})",
                             style: TextStyle(
                                 fontSize: 18.0, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.justify,
@@ -128,17 +172,17 @@ class RecipeDetail extends StatelessWidget {
                           ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            itemCount: sRecipe.ingredients.length,
+                            itemCount: widget.sRecipe.ingredients.length,
                             itemBuilder: (BuildContext ctxt, int index) {
                               return new Text(
-                                  "- ${sRecipe.ingredients.values.elementAt(index)}");
+                                  "- ${widget.sRecipe.ingredients.values.elementAt(index)}");
                             },
                           ),
                           SizedBox(
                             height: 10.0,
                           ),
                           Text(
-                            "Instructions (${sRecipe.instructions.length})",
+                            "Instructions (${widget.sRecipe.instructions.length})",
                             style: TextStyle(
                                 fontSize: 18.0, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.justify,
@@ -146,10 +190,10 @@ class RecipeDetail extends StatelessWidget {
                           ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            itemCount: sRecipe.instructions.length,
+                            itemCount: widget.sRecipe.instructions.length,
                             itemBuilder: (BuildContext ctxt, int index) {
                               return new Text(
-                                  "${index + 1}.${sRecipe.instructions.values.elementAt(index)}");
+                                  "${index + 1}.${widget.sRecipe.instructions.values.elementAt(index)}");
                             },
                           ),
                         ],

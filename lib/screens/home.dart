@@ -1,8 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:recipe_gram/models/recipe_model.dart';
 import 'package:recipe_gram/screens/account/profile.dart';
 import 'package:recipe_gram/screens/feed.dart';
 import 'package:recipe_gram/screens/recipe/new_recipe.dart';
 import 'package:recipe_gram/screens/search.dart';
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:recipe_gram/utilities/utils.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,12 +21,9 @@ class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
 
-  static List<Widget> _pages = <Widget>[
-    FeedPage(),
-    SearchPage(),
-    NewRecipePage(),
-    ProfilePage()
-  ];
+  String searchText = "";
+  late List<Recipe> recipeSearched = <Recipe>[];
+  TextEditingController _searchController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,12 @@ class _HomePageState extends State<HomePage> {
       ),
       body: IndexedStack(
         index: _selectedIndex,
-        children: _pages,
+        children: <Widget>[
+          FeedPage(),
+          SearchPage(recipeList: recipeSearched),
+          NewRecipePage(),
+          ProfilePage()
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
@@ -56,11 +66,20 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSearchField() {
     return TextField(
       autofocus: false,
+      controller: _searchController,
+      onEditingComplete: () {
+        setState(() {
+          searchText = _searchController.text;
+        });
+        search();
+      },
       decoration: InputDecoration(
           hintText: "Search",
+          filled: true,
+          fillColor: Color.fromRGBO(253, 223, 223, 1),
           border: UnderlineInputBorder(),
           contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-          hintStyle: TextStyle(color: Colors.black12),
+          hintStyle: TextStyle(color: Colors.black38),
           prefixIcon: new Icon(Icons.search, color: Colors.grey)),
       style: TextStyle(color: Colors.black, fontSize: 16.0),
     );
@@ -74,6 +93,23 @@ class _HomePageState extends State<HomePage> {
     }
 
     return <Widget>[];
+  }
+
+  void search() async {
+    if (searchText.isNotEmpty) {
+      final response = await http.get(Uri.parse(Utils.apiHost + "/recipe/$searchText"));
+      final jsonResponse = json.decode(response.body);
+
+      if (jsonResponse['status'] != null && jsonResponse['status'] == 200) {
+        final data = jsonResponse['data'] as List;
+
+        setState(() {
+          recipeSearched = data.map<Recipe>((item) => Recipe.fromJson(item)).toList();
+        });
+      } else {
+        Fluttertoast.showToast(msg: "Server error. Please contact admin.");
+      }
+    }
   }
 
   void _onItemTapped(int idx) {

@@ -30,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
       return true;
     } else if(jsonResponse['error'] != null) {
       final errors = jsonResponse['error'];
+
       Fluttertoast.showToast(msg: errors.values.join(", "), toastLength: Toast.LENGTH_LONG);
     } else {
       Fluttertoast.showToast(msg: "Server Error. Contact helpdesk. [${response.statusCode}]");

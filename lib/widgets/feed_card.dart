@@ -38,8 +38,6 @@ class FeedCard extends StatelessWidget {
                     topRight: Radius.circular(5.0),
                     topLeft: Radius.circular(5.0),
                   ),
-                  // TODO
-                  // CHANGE BACK TO Image.Network
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(

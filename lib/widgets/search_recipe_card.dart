@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_gram/models/recipe_model.dart';
 import 'package:recipe_gram/screens/recipe/recipe_details.dart';
 import 'package:recipe_gram/utilities/repgram-theme.dart';
 
 class SearchRecipeCard extends StatelessWidget {
-  const SearchRecipeCard({Key? key}) : super(key: key);
+  Recipe sRecipe;
+  SearchRecipeCard({required this.sRecipe});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class SearchRecipeCard extends StatelessWidget {
         color: RepGramColor.secondary,
         child: InkWell(
           onTap: () {
-            //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => new RecipeDetail(sRecipe: ,)));
+            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => new RecipeDetail(sRecipe: sRecipe,)));
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -24,8 +26,8 @@ class SearchRecipeCard extends StatelessWidget {
                     topLeft: Radius.circular(5.0),
                     bottomLeft: Radius.circular(5.0),
                   ),
-                  child: Image.asset(
-                    'assets/nasi kerabu.png',
+                  child: Image.network(
+                    sRecipe.image,
                     height: 120,
                     fit: BoxFit.fill,
                   ),
@@ -36,34 +38,34 @@ class SearchRecipeCard extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          "Nasi Kerabu",
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-                        ),
+                      Column(
+                        children: [
+                          Text(
+                            sRecipe.name,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16.0),
+                          ),
+                        ],
                       ),
-                      /*
-                      Expanded(
-                        child: Card(
-                          color: Colors.white54,
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(
-                              "ABC",
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5.0, right: 5.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${sRecipe.heat} heat",
+                              textAlign: TextAlign.right,
                             ),
-                          )
+                            SizedBox(width: 5.0,),
+                            Image.asset('assets/heat_small.png', width: 17, height: 20,)
+                          ],
                         ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          "ABC",
-                          textAlign: TextAlign.right,
-                        ),
-                      ),
-                       */
+                      )
                     ],
                   ),
                 ),

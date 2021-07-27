@@ -157,6 +157,7 @@ class _SettingPageState extends State<SettingPage> {
                     Divider(
                       color: Colors.black,
                     ),
+                    /*
                     ElevatedButton(
                       onPressed: () {
                         // TODO
@@ -164,6 +165,7 @@ class _SettingPageState extends State<SettingPage> {
                       },
                       child: Text("Tag Settings"),
                     ),
+                     */
                     ElevatedButton(
                       onPressed: logout,
                       child: Text("Logout"),

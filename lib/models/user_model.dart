@@ -1,5 +1,5 @@
 class User {
-  final int id;
+  final String id;
   final String fullName;
   final String username;
   final String email;
@@ -22,12 +22,12 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
-      fullName: json['fullName'],
+      fullName: json['full_name'],
       username: json['username'],
       email: json['email'],
       phone: json['phone'],
       bio: json['bio'],
-      profileImgUrl: json['profileImgUrl'],
+      profileImgUrl: json['profileImgUrl'] ?? "",
       favourites: json['favourites'],
     );
   }
