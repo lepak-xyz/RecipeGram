@@ -1,16 +1,24 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:recipe_gram/models/recipe_model.dart';
+import 'package:recipe_gram/providers/user_provider.dart';
 import 'package:recipe_gram/screens/account/profile.dart';
 import 'package:recipe_gram/screens/feed.dart';
 import 'package:recipe_gram/screens/recipe/new_recipe.dart';
 import 'package:recipe_gram/screens/search.dart';
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:recipe_gram/utilities/utils.dart';
+import 'package:provider/provider.dart';
+
+class Test extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,6 +27,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _newRecipeKey = GlobalKey<NewRecipePageState>();
+
   int _selectedIndex = 0;
 
   String searchText = "";
@@ -26,7 +36,20 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _searchController = new TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    context.watch<UserProvider>().isAuth().then((auth) {
+      print("Auth: " + auth.toString());
+
+      if (!auth) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    });
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -40,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           FeedPage(),
           SearchPage(recipeList: recipeSearched),
-          NewRecipePage(),
+          NewRecipePage(key: _newRecipeKey,),
           ProfilePage()
         ],
       ),
@@ -88,7 +111,9 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _buildActions() {
     if (_selectedIndex == 2) {
       return <Widget>[
-        TextButton(onPressed: () {}, child: Text("Share", style: TextStyle(color: Colors.blue[300]),))
+        TextButton(onPressed: () {
+          _newRecipeKey.currentState!.share();
+        }, child: Text("Share", style: TextStyle(color: Colors.blue[300]),))
       ];
     }
 
@@ -113,8 +138,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onItemTapped(int idx) {
-    setState(() {
-      _selectedIndex = idx;
-    });
+    if (_selectedIndex != idx) {
+      switch(idx) {
+        case 3:
+          context.read<UserProvider>().getUserExtraInfo();
+          break;
+      }
+
+      setState(() {
+        _selectedIndex = idx;
+      });
+    }
   }
 }

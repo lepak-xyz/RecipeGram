@@ -1,11 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'package:recipe_gram/utilities/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:recipe_gram/providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -18,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
 
+  /*
   Future<bool> login(String email, pass) async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     final response = await http.get(Uri.parse(Utils.apiHost + "/auth/login?email=$email&password=$pass"));
@@ -38,6 +37,9 @@ class _LoginPageState extends State<LoginPage> {
 
     return false;
   }
+   */
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Username',
+                              'Email',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -145,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   ElevatedButton(
                     onPressed: (usernameController.text.isEmpty || passwordController.text.isEmpty) ? null : () {
-                      login(usernameController.text, passwordController.text).then((flag) {
+                      context.read<UserProvider>().login(usernameController.text, passwordController.text).then((flag) {
                         if (flag) {
                           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
                           Fluttertoast.showToast(msg: "You have been successfully logged in.");

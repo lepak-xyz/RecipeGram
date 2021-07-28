@@ -5,7 +5,7 @@ class Recipe {
   final String caption;
   final String image;
   final int heat;
-  final List tags;
+  final List? tags;
   final Map ingredients;
   final Map instructions;
 

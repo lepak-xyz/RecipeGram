@@ -1,12 +1,12 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recipe_gram/models/recipe_model.dart';
-import 'package:recipe_gram/models/user_model.dart';
+import 'package:recipe_gram/providers/user_provider.dart';
 import 'package:share/share.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class RecipeDetail extends StatefulWidget {
   final Recipe sRecipe;
@@ -17,38 +17,9 @@ class RecipeDetail extends StatefulWidget {
 }
 
 class _RecipeDetailState extends State<RecipeDetail> {
-  late User _user;
-  bool isFavourite = false;
-
   @override
   void initState() {
     super.initState();
-    loadUserData();
-  }
-
-  loadUserData() async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
-    _user = User.fromJson(json.decode(_prefs.getString("user") ?? ""));
-
-    setState(() {
-      isFavourite = _user.favourites.contains(widget.sRecipe.id);
-    });
-  }
-
-  addToFavourites() async {
-    // TODO
-    // ADD TO DATABASE
-    setState(() {
-      isFavourite = true;
-    });
-    return false;
-  }
-
-  removeFavourites() async {
-    // TODO
-    // REMOVE FROM DATABASE
-    isFavourite = false;
-    return false;
   }
 
   @override
@@ -70,11 +41,9 @@ class _RecipeDetailState extends State<RecipeDetail> {
                         children: <Widget>[
                           ListTile(
                             leading: Icon(Icons.favorite),
-                            title: isFavourite ? Text("Remove from Favourite") : Text("Add To Favourite"),
+                            title: context.watch<UserProvider>().getUserFavourites().contains(widget.sRecipe) ? Text("Remove from Favourite") : Text("Add To Favourite"),
                             onTap: () {
-                              setState(() {
-                                isFavourite = !isFavourite;
-                              });
+                              context.read<UserProvider>().addOrRemoveFavourite(widget.sRecipe);
                               Navigator.pop(context);
                             },
                           ),
@@ -98,39 +67,42 @@ class _RecipeDetailState extends State<RecipeDetail> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: NetworkImage(widget.sRecipe.image),
-                        fit: BoxFit.cover),
-                  ),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                    child: new Container(
-                      height: ctxSize.height * 0.3,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.0),
+            Container(
+              height: ctxSize.height * 0.3,
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(widget.sRecipe.image),
+                          fit: BoxFit.cover),
+                    ),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      child: new Container(
+                        height: ctxSize.height * 0.3,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.0),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Center(
-                  child: Text(widget.sRecipe.name),
-                ),
-                Align(
-                  alignment: Alignment(0.9, -7.0),
-                  heightFactor: 0.5,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      print("hehe");
-                    },
-                    child: Icon(Icons.fireplace),
+                  Center(
+                    child: Text(widget.sRecipe.name),
                   ),
-                ),
-              ],
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        // TODO
+                        // ADD HEAT
+                      },
+                      child: Image.asset('assets/heat_small.png'),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Container(
               margin: EdgeInsets.only(top: 30.0),

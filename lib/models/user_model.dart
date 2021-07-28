@@ -22,12 +22,12 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
-      fullName: json['full_name'],
+      fullName: json['full_name'] ??= "",
       username: json['username'],
       email: json['email'],
       phone: json['phone'],
-      bio: json['bio'],
-      profileImgUrl: json['profileImgUrl'] ?? "",
+      bio: json['bio'] ??= "",
+      profileImgUrl: json['profileImgUrl'] ??= "",
       favourites: json['favourites'],
     );
   }

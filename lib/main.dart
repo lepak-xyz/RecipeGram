@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:recipe_gram/providers/user_provider.dart';
 import 'package:recipe_gram/screens/home.dart';
 import 'package:recipe_gram/screens/login.dart';
 import 'package:recipe_gram/screens/register.dart';
@@ -7,7 +9,15 @@ import 'package:recipe_gram/utilities/repgram-theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
+  //runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -62,11 +72,15 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     } else {
       Future.delayed(const Duration(seconds: 1), () {
-        if (_sharedPreferences.getString("token") != null) {
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-        } else {
-          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-        }
+        context.read<UserProvider>().isLoggedIn().then((flag) {
+          if (flag) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/home', (route) => false);
+          } else {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/login', (route) => false);
+          }
+        });
       });
     }
   }

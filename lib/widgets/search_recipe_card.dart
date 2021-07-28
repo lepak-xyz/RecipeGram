@@ -4,7 +4,7 @@ import 'package:recipe_gram/screens/recipe/recipe_details.dart';
 import 'package:recipe_gram/utilities/repgram-theme.dart';
 
 class SearchRecipeCard extends StatelessWidget {
-  Recipe sRecipe;
+  final Recipe sRecipe;
   SearchRecipeCard({required this.sRecipe});
 
   @override

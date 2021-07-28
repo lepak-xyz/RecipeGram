@@ -4,7 +4,6 @@ import 'package:recipe_gram/widgets/search_recipe_card.dart';
 
 class SearchPage extends StatefulWidget {
   List<Recipe> recipeList;
-
   SearchPage({required this.recipeList});
 
   @override

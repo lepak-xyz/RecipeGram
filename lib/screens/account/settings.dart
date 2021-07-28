@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:recipe_gram/providers/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,32 +13,92 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  // TODO
+  // Disable textform when in loading state
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  final TextEditingController _nameController = new TextEditingController();
+  final TextEditingController _usernameController = new TextEditingController();
+  final TextEditingController _bioController = new TextEditingController();
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> logout() async {
-    final SharedPreferences prefs = await _prefs;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    prefs.remove("token").then((value) => () {
-      prefs.remove("user");
-      Fluttertoast.showToast(msg: "You have been successfully logged out.", toastLength: Toast.LENGTH_LONG);
-    }).onError((error, stackTrace) => () {
-      Fluttertoast.showToast(msg: "An error has been occurred. [${error.toString()}]", toastLength: Toast.LENGTH_LONG);
-    });
+    prefs
+        .remove("token")
+        .then((value) => () {
+              context.read<UserProvider>().auth = false;
+              prefs.remove("user");
+              Fluttertoast.showToast(
+                  msg: "You have been successfully logged out.",
+                  toastLength: Toast.LENGTH_LONG);
+            })
+        .onError((error, stackTrace) => () {
+              Fluttertoast.showToast(
+                  msg: "An error has been occurred. [${error.toString()}]",
+                  toastLength: Toast.LENGTH_LONG);
+            });
 
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
   Future<void> updateProfile() async {
-    UserProvider.updateProfile().then((value) => () {
-      Fluttertoast.showToast(msg: "Your profile has been successfully updated.");
-    });
+    context
+        .read<UserProvider>()
+        .updateProfile(
+          _nameController.text,
+          _usernameController.text,
+          _bioController.text,
+        )
+        .then(
+      (flag) {
+        if (flag) {
+          Fluttertoast.showToast(
+              msg: "Your profile has been successfully updated.");
+          //Navigator.pop(context);
+        }
+      },
+    );
+  }
 
-    Navigator.pop(context);
+  chooseImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        context.read<UserProvider>().updatePhoto(pickedFile).then((flag) {
+          if (flag) {
+            Fluttertoast.showToast(
+                msg: "Profile photo has been successfully updated.");
+          }
+        });
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = context.read<UserProvider>().user!.fullName;
+    _usernameController.text = context.read<UserProvider>().user!.username;
+    _bioController.text = context.read<UserProvider>().user!.bio;
+  }
+
+  /*
+  *
+  * WIDGET
+  *
+   */
+  Widget showImage() {
+    return CircleAvatar(
+      backgroundImage: context.watch<UserProvider>().user!.profileImgUrl != ""
+          ? NetworkImage(context.watch<UserProvider>().user!.profileImgUrl)
+          : AssetImage("assets/no-profile.png") as ImageProvider,
+      radius: 60,
+      backgroundColor: Colors.red,
+    );
   }
 
   @override
@@ -64,16 +124,9 @@ class _SettingPageState extends State<SettingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ClipRRect(
-                child: Image.asset(
-                  'assets/profile.png',
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.fill,
-                ),
-              ),
+              showImage(),
               TextButton(
-                onPressed: () {},
+                onPressed: chooseImage,
                 child: Text(
                   "Change profile photo",
                   style: TextStyle(color: Colors.blue[800]),
@@ -97,10 +150,12 @@ class _SettingPageState extends State<SettingPage> {
                           flex: 33,
                         ),
                         Expanded(
-                          child: TextField(
+                          child: TextFormField(
+                            controller: _nameController,
                             decoration: InputDecoration(
-                                border: UnderlineInputBorder(),
-                                hintText: 'Ali Abu'),
+                              border: UnderlineInputBorder(),
+                              hintText: 'Full Name',
+                            ),
                           ),
                           flex: 76,
                         )
@@ -116,10 +171,12 @@ class _SettingPageState extends State<SettingPage> {
                           flex: 33,
                         ),
                         Expanded(
-                          child: TextField(
+                          child: TextFormField(
+                            controller: _usernameController,
                             decoration: InputDecoration(
-                                border: UnderlineInputBorder(),
-                                hintText: '@aliabu'),
+                              border: UnderlineInputBorder(),
+                              hintText: "Username",
+                            ),
                           ),
                           flex: 76,
                         )
@@ -136,11 +193,14 @@ class _SettingPageState extends State<SettingPage> {
                           flex: 33,
                         ),
                         Expanded(
-                          child: TextField(
+                          child: TextFormField(
+                            controller: _bioController,
                             maxLines: 4,
+                            maxLength: 60,
                             decoration: InputDecoration(
-                                border: UnderlineInputBorder(),
-                                hintText: '@aliabu'),
+                              border: UnderlineInputBorder(),
+                              hintText: 'Biodata [max: 60]',
+                            ),
                           ),
                           flex: 76,
                         )

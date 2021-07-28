@@ -6,9 +6,7 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Recipe? recipe;
-
-    return FlatButton(
+    return ElevatedButton(
         onPressed: () {},
         child: Card(
           child: Row(
