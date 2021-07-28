@@ -43,6 +43,9 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> updateProfile() async {
+    Fluttertoast.showToast(
+        msg: "Loading...");
+
     context
         .read<UserProvider>()
         .updateProfile(
@@ -55,7 +58,9 @@ class _SettingPageState extends State<SettingPage> {
         if (flag) {
           Fluttertoast.showToast(
               msg: "Your profile has been successfully updated.");
-          //Navigator.pop(context);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Failed to update profile.");
         }
       },
     );

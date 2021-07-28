@@ -126,10 +126,7 @@ class UserService {
         'Content-Type': "application/json"
       },
     );
-
     final jsonResponse = json.decode(response.body);
-
-    print(jsonResponse);
 
     if (response.statusCode == 200) {
       checkToken(notifier);
@@ -263,7 +260,7 @@ class UserService {
     if (token != null && token != "") {
       final response = await http.get(
         Uri.parse(API_ENDPOINT + "/favourites?action=remove&rid=${rep.id}"),
-        headers: {'Authorization': 'Bearer ${token}'},
+        headers: {'Authorization': 'Bearer $token'},
       );
       final jsonResponse = json.decode(response.body);
 

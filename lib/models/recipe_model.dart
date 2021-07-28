@@ -5,7 +5,7 @@ class Recipe {
   final String caption;
   final String image;
   final int heat;
-  final List? tags;
+  final List tags;
   final Map ingredients;
   final Map instructions;
 
@@ -29,7 +29,7 @@ class Recipe {
       caption: json['caption'],
       image: json['images'],
       heat: int.parse(json['heat']),
-      tags: json['tags'],
+      tags: json['tags'] ??= [],
       ingredients: json['ingredients'],
       instructions: json['instructions'],
     );
