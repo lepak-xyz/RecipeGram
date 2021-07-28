@@ -54,7 +54,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late SharedPreferences _sharedPreferences;
   bool showButton = false;
 
   @override
@@ -64,13 +63,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   checkLoginStatus() async {
-    _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    final token = _sharedPreferences.getString("token");
 
-    if (_sharedPreferences.getBool("first_time") != null) {
-      setState(() {
-        showButton = true;
-      });
-    } else {
+    if (token != null && token.isNotEmpty) {
       Future.delayed(const Duration(seconds: 1), () {
         context.read<UserProvider>().isLoggedIn().then((flag) {
           if (flag) {
@@ -81,6 +77,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 context, '/login', (route) => false);
           }
         });
+      });
+    } else {
+      setState(() {
+        showButton = true;
       });
     }
   }

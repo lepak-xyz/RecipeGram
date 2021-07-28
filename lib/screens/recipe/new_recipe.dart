@@ -103,6 +103,7 @@ class NewRecipePageState extends State<NewRecipePage> {
   void share() {
     if (_formKey.currentState!.validate()) {
       if (image != null) {
+        Fluttertoast.showToast(msg: "Loading...");
         context
             .read<UserProvider>()
             .createPost(

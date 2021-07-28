@@ -18,6 +18,10 @@ class UserProvider with ChangeNotifier, DiagnosticableTreeMixin {
     return await UserService.login(username, password, this);
   }
 
+  Future<bool> register(String email, String username, String password, String phone) async {
+    return await UserService.register(email, username, password, phone, this);
+  }
+
   Future<bool> updateProfile(String name, String username, String bio) async {
     return await UserService.updateProfile(name, username, bio, this);
   }

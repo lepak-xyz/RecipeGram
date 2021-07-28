@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import 'package:recipe_gram/utilities/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:recipe_gram/providers/user_provider.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -12,35 +9,17 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = new TextEditingController();
   TextEditingController usernameController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
   TextEditingController phoneController = new TextEditingController();
 
-  Future<bool> register(
-    String email,
-    String username,
-    String password,
-    String phone,
-  ) async {
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    final response = await http.get(
-        Uri.parse(Utils.apiHost + "/auth/register?email=$email&username=$username&password=$password&phone=$phone"));
-    final jsonResponse = json.decode(response.body);
-
-    if (jsonResponse['access_token'] != null) {
-      _preferences.setString("token", jsonResponse['access_token']);
-      _preferences.setString("user", json.encode(jsonResponse['user']));
-
-      return true;
-    } else if(jsonResponse['error'] != null) {
-      final errors = jsonResponse['error'];
-      Fluttertoast.showToast(msg: errors.values.join(", "), toastLength: Toast.LENGTH_LONG);
-    } else {
-      Fluttertoast.showToast(msg: "Server Error. Contact helpdesk. [${response.statusCode}]");
+  String? validate(value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter some text';
     }
-
-    return false;
+    return null;
   }
 
   @override
@@ -79,158 +58,167 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(25.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Email
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Email',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Colors.black),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        TextFormField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Colors.black12,
-                            filled: true,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Email
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Email',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.black),
                           ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    // Username
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Username',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Colors.black),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        TextFormField(
-                          controller: usernameController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Colors.black12,
-                            filled: true,
+                          SizedBox(
+                            height: 8,
                           ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    // Password
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Password',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Colors.black),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        TextFormField(
-                          controller: passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Colors.black12,
-                            filled: true,
+                          TextFormField(
+                            validator: validate,
+                            controller: emailController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Colors.black12,
+                              filled: true,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      // Username
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Username',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.black),
                           ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    // Phone No
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Phone Number',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Colors.black),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        TextFormField(
-                          controller: phoneController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            fillColor: Colors.black12,
-                            filled: true,
+                          SizedBox(
+                            height: 8,
                           ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    // Button
-                    ElevatedButton(
-                        onPressed: (emailController.text.isEmpty ||
-                                usernameController.text.isEmpty ||
-                                passwordController.text.isEmpty ||
-                                phoneController.text.isEmpty)
-                            ? null
-                            : () {
-                                register(
-                                        emailController.text,
-                                        usernameController.text,
-                                        passwordController.text,
-                                        phoneController.text)
-                                    .then((flag) {
-                                  if (flag) {
-                                    Navigator.pushNamedAndRemoveUntil(
-                                        context, '/home', (route) => false);
-                                  }
-                                });
+                          TextFormField(
+                            validator: validate,
+                            controller: usernameController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Colors.black12,
+                              filled: true,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      // Password
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Password',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.black),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          TextFormField(
+                            validator: validate,
+                            controller: passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Colors.black12,
+                              filled: true,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      // Phone No
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Phone Number',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.black),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          TextFormField(
+                            validator: validate,
+                            controller: phoneController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              fillColor: Colors.black12,
+                              filled: true,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      // Button
+                      ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              Fluttertoast.showToast(msg: "Loading...");
+
+                              context
+                                  .read<UserProvider>()
+                                  .register(
+                                    emailController.text,
+                                    usernameController.text,
+                                    passwordController.text,
+                                    phoneController.text,
+                                  )
+                                  .then((value) {
+                                if (value) {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/home', (route) => false);
+                                }
+                              });
+                            }
+                          },
+                          child: Text("Register")),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account ?",
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black),
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
                               },
-                        child: Text("Register")),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Already have an account ?",
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black),
-                        ),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text("Login"))
-                      ],
-                    )
-                  ],
+                              child: Text("Login"))
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             )),
