@@ -2,14 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:recipe_gram/models/recipe_model.dart';
 import 'package:recipe_gram/providers/user_provider.dart';
 import 'package:share/share.dart';
-import 'package:provider/provider.dart';
 
 class RecipeDetail extends StatefulWidget {
   final Recipe sRecipe;
+
   const RecipeDetail({required this.sRecipe});
 
   @override
@@ -17,9 +17,13 @@ class RecipeDetail extends StatefulWidget {
 }
 
 class _RecipeDetailState extends State<RecipeDetail> {
+  ImageProvider? image;
+
   @override
   void initState() {
     super.initState();
+
+    image = NetworkImage(widget.sRecipe.image);
   }
 
   @override
@@ -41,7 +45,9 @@ class _RecipeDetailState extends State<RecipeDetail> {
                         children: <Widget>[
                           ListTile(
                             leading: Icon(Icons.favorite),
-                            title: context.watch<UserProvider>().getUserFavourites().contains(widget.sRecipe) ? Text("Remove from Favourite") : Text("Add To Favourite"),
+                            title: context.watch<UserProvider>().getUserFavourites().contains(widget.sRecipe)
+                                ? Text("Remove from Favourite")
+                                : Text("Add To Favourite"),
                             onTap: () {
                               context.read<UserProvider>().addOrRemoveFavourite(widget.sRecipe);
                               Navigator.pop(context);
@@ -74,9 +80,11 @@ class _RecipeDetailState extends State<RecipeDetail> {
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: NetworkImage(widget.sRecipe.image),
-                          fit: BoxFit.cover),
+                      image: DecorationImage(image: image!, fit: BoxFit.cover, onError: (errDetails, trace) {
+                        setState(() {
+                          image = AssetImage('assets/no-image.png');
+                        });
+                      }),
                     ),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
@@ -95,10 +103,9 @@ class _RecipeDetailState extends State<RecipeDetail> {
                     alignment: Alignment.bottomRight,
                     child: FloatingActionButton(
                       onPressed: () {
-                        // TODO
-                        // ADD HEAT
+                        context.read<UserProvider>().heatRecipe(widget.sRecipe);
                       },
-                      child: Image.asset('assets/heat_small.png'),
+                      child: Image.asset('assets/heat_small.png', color: (context.watch<UserProvider>().user!.heats.contains(widget.sRecipe.id)) ? null : Colors.white,),
                     ),
                   ),
                 ],
@@ -117,10 +124,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                       child: Text(
                         widget.sRecipe.name,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 24.0,
-                            fontFamily: 'Staatliches',
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 24.0, fontFamily: 'Staatliches', fontWeight: FontWeight.bold),
                       ),
                     ),
                     Divider(
@@ -137,8 +141,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                         children: [
                           Text(
                             "Ingredients (${widget.sRecipe.ingredients.length})",
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.justify,
                           ),
                           ListView.builder(
@@ -146,8 +149,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: widget.sRecipe.ingredients.length,
                             itemBuilder: (BuildContext ctxt, int index) {
-                              return new Text(
-                                  "- ${widget.sRecipe.ingredients.values.elementAt(index)}");
+                              return new Text("- ${widget.sRecipe.ingredients.values.elementAt(index)}");
                             },
                           ),
                           SizedBox(
@@ -155,8 +157,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                           ),
                           Text(
                             "Instructions (${widget.sRecipe.instructions.length})",
-                            style: TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.justify,
                           ),
                           ListView.builder(
@@ -164,8 +165,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: widget.sRecipe.instructions.length,
                             itemBuilder: (BuildContext ctxt, int index) {
-                              return new Text(
-                                  "${index + 1}.${widget.sRecipe.instructions.values.elementAt(index)}");
+                              return new Text("${index + 1}.${widget.sRecipe.instructions.values.elementAt(index)}");
                             },
                           ),
                         ],

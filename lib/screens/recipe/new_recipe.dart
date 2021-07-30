@@ -30,8 +30,7 @@ class NewRecipePageState extends State<NewRecipePage> {
       color: Colors.white,
       child: FlatButton(
         onPressed: () async {
-          final pickedFile =
-              await _picker.pickImage(source: ImageSource.gallery);
+          final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
           if (pickedFile != null) {
             setState(() {
@@ -70,10 +69,7 @@ class NewRecipePageState extends State<NewRecipePage> {
         children: [
           Text(
             'Tag',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: RepGramColor.primary,
-                fontSize: 18.0),
+            style: TextStyle(fontWeight: FontWeight.bold, color: RepGramColor.primary, fontSize: 18.0),
           ),
           SizedBox(
             height: 10.0,
@@ -104,6 +100,8 @@ class NewRecipePageState extends State<NewRecipePage> {
     if (_formKey.currentState!.validate()) {
       if (image != null) {
         Fluttertoast.showToast(msg: "Loading...");
+        context.read<UserProvider>().setBusyState(true);
+
         context
             .read<UserProvider>()
             .createPost(
@@ -122,8 +120,9 @@ class NewRecipePageState extends State<NewRecipePage> {
               instructionsController.text = "";
               image = null;
             });
-            Fluttertoast.showToast(
-                msg: "Your recipe has been successfully posted!");
+
+            Fluttertoast.showToast(msg: "Your recipe has been successfully posted!");
+            context.read<UserProvider>().setBusyState(false);
           }
         });
       } else {
@@ -195,10 +194,7 @@ class NewRecipePageState extends State<NewRecipePage> {
                   children: [
                     Text(
                       'Recipe Name',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: RepGramColor.primary,
-                          fontSize: 18.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: RepGramColor.primary, fontSize: 18.0),
                     ),
                     TextFormField(
                       validator: validate,
@@ -223,10 +219,7 @@ class NewRecipePageState extends State<NewRecipePage> {
                   children: [
                     Text(
                       'Ingredients',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: RepGramColor.primary,
-                          fontSize: 18.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: RepGramColor.primary, fontSize: 18.0),
                     ),
                     TextFormField(
                       validator: validate,
@@ -234,8 +227,7 @@ class NewRecipePageState extends State<NewRecipePage> {
                       maxLines: 5,
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(),
-                        hintText:
-                            'Tell us your secret ingredients... (separate by using new line)',
+                        hintText: 'Tell us your secret ingredients... (separate by using new line)',
                       ),
                     ),
                   ],
@@ -253,10 +245,7 @@ class NewRecipePageState extends State<NewRecipePage> {
                   children: [
                     Text(
                       'Instructions',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: RepGramColor.primary,
-                          fontSize: 18.0),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: RepGramColor.primary, fontSize: 18.0),
                     ),
                     TextFormField(
                       validator: validate,
@@ -264,8 +253,7 @@ class NewRecipePageState extends State<NewRecipePage> {
                       maxLines: 5,
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(),
-                        hintText:
-                            'Tell us your magical touch... (separate by using new line)',
+                        hintText: 'Tell us your magical touch... (separate by using new line)',
                       ),
                     ),
                   ],

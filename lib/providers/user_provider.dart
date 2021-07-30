@@ -3,12 +3,23 @@ import 'package:image_picker/image_picker.dart';
 import 'package:recipe_gram/models/recipe_model.dart';
 import 'package:recipe_gram/models/user_model.dart';
 import 'package:recipe_gram/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier, DiagnosticableTreeMixin {
   User? user;
   List<Recipe> favourite = [];
   List<Recipe> posts = [];
   bool auth = false;
+  bool _isBusy = false;
+
+  void setBusyState(bool flag) {
+    this._isBusy = flag;
+    notifyListeners();
+  }
+
+  bool isBusy() {
+    return _isBusy;
+  }
 
   Future<bool> isLoggedIn() async {
     return await UserService.checkToken(this);
@@ -20,6 +31,22 @@ class UserProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<bool> register(String email, String username, String password, String phone) async {
     return await UserService.register(email, username, password, phone, this);
+  }
+
+  Future<bool> logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var flag = false;
+
+    await prefs.remove("token");
+    this.favourite.clear();
+    this.posts.clear();
+    this.auth = false;
+    flag = true;
+
+    notifyListeners();
+    //Fluttertoast.showToast(msg: "An error has been occurred. [${error.toString()}]", toastLength: Toast.LENGTH_LONG);
+
+    return flag;
   }
 
   Future<bool> updateProfile(String name, String username, String bio) async {
@@ -50,13 +77,22 @@ class UserProvider with ChangeNotifier, DiagnosticableTreeMixin {
     return await UserService.removeFromFavourite(rep, this);
   }
 
+  Future<bool> heatRecipe(Recipe rep) async {
+    var flag = await UserService.heatRecipe(rep, user!.heats.contains(rep.id), this);
+    notifyListeners();
+
+    return flag;
+  }
+
   Future<bool> isAuth() async {
     return auth;
   }
 
-  void getUserExtraInfo() {
-    UserService.getPosts(this);
-    UserService.getFavourites(this);
+  Future<void> getUserExtraInfo() async {
+    await UserService.getPosts(this);
+    await UserService.getFavourites(this);
+
+    notifyListeners();
   }
 
   User? getCurrentUser() {

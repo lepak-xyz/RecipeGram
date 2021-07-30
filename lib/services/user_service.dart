@@ -49,8 +49,7 @@ class UserService {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
 
     var response = await http.get(
-      Uri.parse(
-          Utils.apiHost + "/auth/login?email=$username&password=$password"),
+      Uri.parse(Utils.apiHost + "/auth/login?email=$username&password=$password"),
     );
     final jsonResponse = json.decode(response.body);
 
@@ -64,11 +63,9 @@ class UserService {
       final errors = jsonResponse['error'];
 
       if (errors.values != null) {
-        Fluttertoast.showToast(
-            msg: errors.values.join(", "), toastLength: Toast.LENGTH_LONG);
+        Fluttertoast.showToast(msg: errors.values.join(", "), toastLength: Toast.LENGTH_LONG);
       } else {
-        Fluttertoast.showToast(
-            msg: jsonResponse['error'], toastLength: Toast.LENGTH_LONG);
+        Fluttertoast.showToast(msg: jsonResponse['error'], toastLength: Toast.LENGTH_LONG);
       }
     }
 
@@ -83,8 +80,8 @@ class UserService {
     UserProvider notifier,
   ) async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    final response = await http.get(Uri.parse(Utils.apiHost +
-        "/auth/register?email=$email&username=$username&password=$password&phone=$phone"));
+    final response = await http.get(
+        Uri.parse(Utils.apiHost + "/auth/register?email=$email&username=$username&password=$password&phone=$phone"));
     final jsonResponse = json.decode(response.body);
 
     if (jsonResponse['access_token'] != null) {
@@ -96,11 +93,9 @@ class UserService {
       return true;
     } else if (jsonResponse['error'] != null) {
       final errors = jsonResponse['error'];
-      Fluttertoast.showToast(
-          msg: errors.values.join(", "), toastLength: Toast.LENGTH_LONG);
+      Fluttertoast.showToast(msg: errors.values.join(", "), toastLength: Toast.LENGTH_LONG);
     } else {
-      Fluttertoast.showToast(
-          msg: "Server Error. Contact helpdesk. [${response.statusCode}]");
+      Fluttertoast.showToast(msg: "Server Error. Contact helpdesk. [${response.statusCode}]");
     }
 
     return false;
@@ -108,8 +103,7 @@ class UserService {
 
   // TODO
   // Return `int` error code for textform validation in settings
-  static Future<bool> updateProfile(
-      String name, String username, String bio, UserProvider notifier) async {
+  static Future<bool> updateProfile(String name, String username, String bio, UserProvider notifier) async {
     final SharedPreferences _prefs = await SharedPreferences.getInstance();
     final token = _prefs.getString("token");
 
@@ -121,10 +115,7 @@ class UserService {
         'full_name': name.trim(),
         'bio': bio.trim(),
       }),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': "application/json"
-      },
+      headers: {'Authorization': 'Bearer $token', 'Content-Type': "application/json"},
     );
     final jsonResponse = json.decode(response.body);
 
@@ -133,8 +124,7 @@ class UserService {
       return true;
     } else {
       Fluttertoast.showToast(
-          msg: "An error has been occurred. [Err: ${jsonResponse['error']}]",
-          toastLength: Toast.LENGTH_LONG);
+          msg: "An error has been occurred. [Err: ${jsonResponse['error']}]", toastLength: Toast.LENGTH_LONG);
     }
 
     return false;
@@ -166,12 +156,10 @@ class UserService {
             flag = true;
           } else {
             Fluttertoast.showToast(
-                msg:
-                    "An error has been occurred. [${jsonResponse['status']}: ${jsonResponse['message']}]");
+                msg: "An error has been occurred. [${jsonResponse['status']}: ${jsonResponse['message']}]");
           }
         } else {
-          Fluttertoast.showToast(
-              msg: "${response.statusCode}: ${jsonResponse['error']}");
+          Fluttertoast.showToast(msg: "${response.statusCode}: ${jsonResponse['error']}");
         }
       });
     } else {
@@ -186,8 +174,8 @@ class UserService {
     getFavourites(notifier);
   }
 
-  static addPosts(XFile file, String caption, String name, String ingredients,
-      String instructions, UserProvider notifier) async {
+  static addPosts(
+      XFile file, String caption, String name, String ingredients, String instructions, UserProvider notifier) async {
     final SharedPreferences _prefs = await SharedPreferences.getInstance();
     final token = _prefs.getString("token");
 
@@ -197,6 +185,7 @@ class UserService {
         'caption': caption.trim(),
         'ingredients': ingredients.trim(),
         'instructions': instructions.trim(),
+        'tags': [],
       };
 
       var uri = Uri.parse(API_ENDPOINT + "/recipe");
@@ -207,20 +196,15 @@ class UserService {
       var pic = await http.MultipartFile.fromPath("image", file.path);
 
       request.files.add(pic);
-      http.Response response =
-          await http.Response.fromStream(await request.send());
+      http.Response response = await http.Response.fromStream(await request.send());
       final jsonResponse = json.decode(response.body);
 
       if (response.statusCode == 201) {
         return true;
       } else if (jsonResponse['error']) {
-        Fluttertoast.showToast(
-            msg:
-                "[Add Recipe] ${response.statusCode}: ${jsonResponse['error']} ");
+        Fluttertoast.showToast(msg: "[Add Recipe] ${response.statusCode}: ${jsonResponse['error']} ");
       } else {
-        Fluttertoast.showToast(
-            msg:
-                "Unknown error occurred. Contact Admin [${response.statusCode}]");
+        Fluttertoast.showToast(msg: "Unknown error occurred. Contact Admin [${response.statusCode}]");
         print("Status: " + response.statusCode.toString());
         print(response.body);
       }
@@ -236,7 +220,7 @@ class UserService {
     if (token != null && token != "") {
       final response = await http.get(
         Uri.parse(API_ENDPOINT + "/favourites?action=add&rid=${rep.id}"),
-        headers: {'Authorization': 'Bearer ${token}'},
+        headers: {'Authorization': 'Bearer $token'},
       );
       final jsonResponse = json.decode(response.body);
 
@@ -245,8 +229,7 @@ class UserService {
         return true;
       } else {
         print(jsonResponse);
-        Fluttertoast.showToast(
-            msg: "[AddFavourite] ${response.statusCode}: $jsonResponse");
+        Fluttertoast.showToast(msg: "[AddFavourite] ${response.statusCode}: $jsonResponse");
       }
     }
 
@@ -266,13 +249,13 @@ class UserService {
 
       if (response.statusCode == 200) {
         if (notifier.favourite.contains(rep)) {
+          notifier.getCurrentUser()!.favourites.remove(rep.id);
           notifier.favourite.remove(rep);
         }
         return true;
       } else {
         print(jsonResponse);
-        Fluttertoast.showToast(
-            msg: "[RemoveFavourite] ${response.statusCode}: $jsonResponse");
+        Fluttertoast.showToast(msg: "[RemoveFavourite] ${response.statusCode}: $jsonResponse");
       }
     }
 
@@ -294,15 +277,12 @@ class UserService {
         if (jsonResponse['status'] != null && jsonResponse['status'] == 200) {
           final data = jsonResponse['data'] as List;
 
-          notifier.posts =
-              data.map<Recipe>((item) => Recipe.fromJson(item)).toList();
+          notifier.posts = data.map<Recipe>((item) => Recipe.fromJson(item)).toList();
         } else {
-          Fluttertoast.showToast(
-              msg: "Posts: Server error. Please contact admin.");
+          Fluttertoast.showToast(msg: "Posts: Server error. Please contact admin.");
         }
       } else {
-        Fluttertoast.showToast(
-            msg: "Posts: ${response.statusCode}: ${jsonResponse['error']}");
+        Fluttertoast.showToast(msg: "Posts: ${response.statusCode}: ${jsonResponse['error']}");
         print(jsonResponse['error']);
       }
     } else {
@@ -319,7 +299,7 @@ class UserService {
     if (token != null && token != "") {
       final response = await http.get(
         Uri.parse(API_ENDPOINT + "/favourites"),
-        headers: {'Authorization': 'Bearer ${token}'},
+        headers: {'Authorization': 'Bearer $token'},
       );
       final jsonResponse = json.decode(response.body);
 
@@ -327,15 +307,12 @@ class UserService {
         if (jsonResponse['status'] != null && jsonResponse['status'] == 200) {
           final data = jsonResponse['data'] as List;
 
-          notifier.favourite =
-              data.map<Recipe>((item) => Recipe.fromJson(item)).toList();
+          notifier.favourite = data.map<Recipe>((item) => Recipe.fromJson(item)).toList();
         } else {
-          Fluttertoast.showToast(
-              msg: "Favourite: Server error. Please contact admin.");
+          Fluttertoast.showToast(msg: "Favourite: Server error. Please contact admin.");
         }
       } else {
-        Fluttertoast.showToast(
-            msg: "Favourite: ${response.statusCode}: ${jsonResponse['error']}");
+        Fluttertoast.showToast(msg: "Favourite: ${response.statusCode}: ${jsonResponse['error']}");
       }
 
       if (jsonResponse['error'] != null) {
@@ -344,5 +321,41 @@ class UserService {
     } else {
       Fluttertoast.showToast(msg: "Favourite: Token expired. Please re-login.");
     }
+  }
+
+  static heatRecipe(Recipe rep, bool heat, UserProvider notifier) async {
+    final SharedPreferences _prefs = await SharedPreferences.getInstance();
+    final token = _prefs.getString("token");
+
+    if (token != null && token != "") {
+      var response = await http.put(
+        Uri.parse(Utils.RECIPE_ENDPOINT + "${rep.id}"),
+        body: jsonEncode(<String, dynamic>{
+          'id': rep.id.toString(),
+          'type': 'heat',
+          'user_id': notifier.getCurrentUser()!.id,
+          'remove': heat,
+        }),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': "application/json"},
+      );
+
+      final jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        if (notifier.getCurrentUser()!.heats.contains(rep.id)) {
+          notifier.getCurrentUser()!.heats.remove(rep.id);
+        } else {
+          notifier.getCurrentUser()!.heats.add(rep.id);
+        }
+
+        return true;
+      } else {
+        Fluttertoast.showToast(msg: "Heat: ${response.statusCode}: ${jsonResponse['error']}");
+      }
+    } else {
+      Fluttertoast.showToast(msg: "Heat: Token expired. Please re-login.");
+    }
+
+    return false;
   }
 }

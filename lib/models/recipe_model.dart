@@ -23,13 +23,13 @@ class Recipe {
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
-      id: int.parse(json['id']),
+      id: int.parse(json['id'].toString()),
       author: json['author'],
       name: json['name'],
       caption: json['caption'],
       image: json['images'],
-      heat: int.parse(json['heat']),
-      tags: json['tags'] ??= [],
+      heat: int.parse(json['heat'].toString()),
+      tags: json['tags'],
       ingredients: json['ingredients'],
       instructions: json['instructions'],
     );

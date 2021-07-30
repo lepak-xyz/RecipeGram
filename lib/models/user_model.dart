@@ -7,6 +7,7 @@ class User {
   final String bio;
   final String profileImgUrl;
   final List favourites;
+  final List heats;
 
   User({
     required this.id,
@@ -17,6 +18,7 @@ class User {
     required this.bio,
     required this.profileImgUrl,
     required this.favourites,
+    required this.heats,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class User {
       bio: json['bio'] ??= "",
       profileImgUrl: json['profileImgUrl'] ??= "",
       favourites: json['favourites'],
+      heats: json['heats'],
     );
   }
 }

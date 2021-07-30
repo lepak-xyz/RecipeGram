@@ -20,11 +20,13 @@ class FeedCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => new RecipeDetail(
-                        sRecipe: recipe,
-                      )));
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => new RecipeDetail(
+                sRecipe: recipe,
+              ),
+            ),
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,14 +45,16 @@ class FeedCard extends StatelessWidget {
                       image: DecorationImage(
                           image: NetworkImage(recipe.image),
                           //image: ExactAssetImage('assets/bolognese.jpg'),
-                          fit: BoxFit.cover),
+                          fit: BoxFit.cover,
+                          onError: (errDetails, stack) {
+
+                          }),
                     ),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
                       child: new Container(
                         height: ctxSize.height * 0.26,
-                        decoration:
-                            BoxDecoration(color: Colors.black.withOpacity(0.4)),
+                        decoration: BoxDecoration(color: Colors.black.withOpacity(0.4)),
                       ),
                     ),
                   ),
@@ -96,8 +100,7 @@ class FeedCard extends StatelessWidget {
                     ),
                     flex: 80,
                   ),
-                  Text("${recipe.heat} heat",
-                      style: TextStyle(fontSize: 13, color: Colors.white))
+                  Text("${recipe.heat} heat", style: TextStyle(fontSize: 13, color: Colors.white))
                 ],
               ),
               subtitle: Text(

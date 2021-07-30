@@ -30,6 +30,10 @@ class SearchRecipeCard extends StatelessWidget {
                     sRecipe.image,
                     height: 120,
                     fit: BoxFit.fill,
+                    errorBuilder:
+                        (BuildContext context, Object exception, StackTrace? stackTrace) {
+                      return const Text('Image not found.', textAlign: TextAlign.center,);
+                    },
                   ),
                 ),
                 flex: 40,

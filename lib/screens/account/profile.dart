@@ -10,8 +10,7 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
-    with SingleTickerProviderStateMixin {
+class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -19,15 +18,6 @@ class _ProfilePageState extends State<ProfilePage>
     super.initState();
     _tabController = new TabController(vsync: this, length: 2);
     _tabController.addListener(_handleTabSelection);
-
-    /*
-    context.read<UserProvider>().isAuth().then((flag) {
-      if (flag) {
-        context.read<UserProvider>().getUserExtraInfo();
-      }
-    });
-
-     */
   }
 
   void _handleTabSelection() {
@@ -117,15 +107,8 @@ class _ProfilePageState extends State<ProfilePage>
                     alignment: Alignment.center,
                     child: CircleAvatar(
                       radius: 40,
-                      backgroundImage: context
-                          .watch<UserProvider>()
-                          .getCurrentUser()!
-                          .profileImgUrl
-                          .isNotEmpty
-                          ? NetworkImage(context
-                          .watch<UserProvider>()
-                          .getCurrentUser()!
-                          .profileImgUrl)
+                      backgroundImage: context.watch<UserProvider>().getCurrentUser()!.profileImgUrl.isNotEmpty
+                          ? NetworkImage(context.watch<UserProvider>().getCurrentUser()!.profileImgUrl)
                           : AssetImage("assets/no-profile.png") as ImageProvider,
                     ),
                   ),
@@ -191,24 +174,12 @@ class _ProfilePageState extends State<ProfilePage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context
-                      .watch<UserProvider>()
-                      .getCurrentUser()!
-                      .username,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+                  context.watch<UserProvider>().getCurrentUser()!.username,
+                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  context
-                      .watch<UserProvider>()
-                      .getCurrentUser()!
-                      .bio !=
-                      ""
-                      ? context
-                      .watch<UserProvider>()
-                      .getCurrentUser()!
-                      .bio
+                  context.watch<UserProvider>().getCurrentUser()!.bio != ""
+                      ? context.watch<UserProvider>().getCurrentUser()!.bio
                       : "This profile has no bio yet.",
                   style: TextStyle(color: Colors.black),
                   maxLines: 3,
@@ -220,15 +191,11 @@ class _ProfilePageState extends State<ProfilePage>
             padding: EdgeInsets.only(left: 10.0, right: 10.0),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                        new SettingPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => new SettingPage()));
               },
               child: Text("Settings"),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -246,9 +213,7 @@ class _ProfilePageState extends State<ProfilePage>
         length: 2,
         child: NestedScrollView(
           headerSliverBuilder: (context, _) {
-            return [
-              ProfileHeader()
-            ];
+            return [ProfileHeader()];
           },
           body: Column(
             children: [
@@ -258,17 +223,13 @@ class _ProfilePageState extends State<ProfilePage>
                   Tab(
                     icon: Icon(
                       Icons.dashboard,
-                      color: _tabController.index == 0
-                          ? Colors.black
-                          : Colors.black26,
+                      color: _tabController.index == 0 ? Colors.black : Colors.black26,
                     ),
                   ),
                   Tab(
                     icon: Icon(
                       Icons.favorite,
-                      color: _tabController.index == 1
-                          ? Colors.black
-                          : Colors.black26,
+                      color: _tabController.index == 1 ? Colors.black : Colors.black26,
                     ),
                   ),
                 ],

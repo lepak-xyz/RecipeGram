@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe_gram/providers/recipe_provider.dart';
 import 'package:recipe_gram/providers/user_provider.dart';
 import 'package:recipe_gram/screens/home.dart';
 import 'package:recipe_gram/screens/login.dart';
@@ -13,6 +14,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => RecipeProvider()),
       ],
       child: MyApp(),
     ),
@@ -63,7 +65,8 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   checkLoginStatus() async {
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences _sharedPreferences =
+        await SharedPreferences.getInstance();
     final token = _sharedPreferences.getString("token");
 
     if (token != null && token.isNotEmpty) {
@@ -107,16 +110,17 @@ class _SplashScreenState extends State<SplashScreen> {
             showButton
                 ? ElevatedButton(
                     onPressed: () {
-                      //Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/login', (route) => false);
+                      Navigator.pushReplacementNamed(
+                          context, '/login');
                     },
                     child: Text("LET'S GET STARTED"),
                     style: ElevatedButton.styleFrom(
-                        primary: Colors.white,
-                        onPrimary: Colors.red[800],
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 60, vertical: 15)))
+                      primary: Colors.white,
+                      onPrimary: Colors.red[800],
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                    ),
+                  )
                 : SizedBox()
           ],
         ),

@@ -22,24 +22,12 @@ class _SettingPageState extends State<SettingPage> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs
-        .remove("token")
-        .then((value) => () {
-              context.read<UserProvider>().auth = false;
-              prefs.remove("user");
-              Fluttertoast.showToast(
-                  msg: "You have been successfully logged out.",
-                  toastLength: Toast.LENGTH_LONG);
-            })
-        .onError((error, stackTrace) => () {
-              Fluttertoast.showToast(
-                  msg: "An error has been occurred. [${error.toString()}]",
-                  toastLength: Toast.LENGTH_LONG);
-            });
-
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    context.read<UserProvider>().logout().then((flag) {
+      if (flag) {
+        Fluttertoast.showToast(msg: "You have been successfully logged out.", toastLength: Toast.LENGTH_LONG);
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    });
   }
 
   Future<void> updateProfile() async {
