@@ -73,11 +73,11 @@ class _SplashScreenState extends State<SplashScreen> {
       Future.delayed(const Duration(seconds: 1), () {
         context.read<UserProvider>().isLoggedIn().then((flag) {
           if (flag) {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/home', (route) => false);
+            Navigator.pushReplacementNamed(
+                context, '/home');
           } else {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/login', (route) => false);
+            Navigator.pushReplacementNamed(
+                context, '/login');
           }
         });
       });
